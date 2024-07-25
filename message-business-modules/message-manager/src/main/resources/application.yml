@@ -1,0 +1,22 @@
+spring:
+  #####数据源配置
+  datasource:
+    url: jdbc:shardingsphere:classpath:sharding-config.yml
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: '*'
+  # redis相关配置
+  redis:
+    # Redis默认情况下有16个分片，这里配置具体使用的分片。默认是索引为0的分片
+    database: 2
+    # Redis服务器地址
+    host: 127.0.0.1
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password:
+    # 连接超时时间（毫秒）
+    timeout: 3000s

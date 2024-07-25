@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdu.message.user.mapper.UserMessageMapper">
+
+    <resultMap type="com.hdu.message.common.base.entity.UserNotice" id="TblUserNoticeMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userNoticeId" column="user_notice_id" jdbcType="INTEGER"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="sourceId" column="source_id" jdbcType="INTEGER"/>
+        <result property="sectionId" column="section_id" jdbcType="INTEGER" />
+        <result property="sendId" column="send_id" jdbcType="INTEGER" />
+        <result property="recipientId" column="recipient_id" jdbcType="INTEGER"/>
+        <result property="pullTime" column="pull_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_notice_id, title, content, state, type, source_id, section_id, send_id, recipient_id, pull_time, create_time, update_time
+    </sql>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="TblUserNoticeMap">
+        select
+        <include refid="Base_Column_List" />
+        from tbl_user_notice
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="TblUserNoticeMap">
+        select
+        <include refid="Base_Column_List" />
+        from tbl_user_notice
+        <where>
+            <if test="userNotice.id != null">
+                and id = #{userNotice.id}
+            </if>
+            <if test="userNotice.userNoticeId != null">
+                and user_notice_id = #{userNotice.userNoticeId}
+            </if>
+            <if test="userNotice.title != null and userNotice.title != ''">
+                and title = #{userNotice.title}
+            </if>
+            <if test="userNotice.content != null and userNotice.content != ''">
+                and content = #{userNotice.content}
+            </if>
+            <if test="userNotice.state != null">
+                and state = #{userNotice.state}
+            </if>
+            <if test="userNotice.type != null">
+                and type = #{userNotice.type}
+            </if>
+            <if test="userNotice.sourceId != null">
+                and source_id = #{userNotice.sourceId}
+            </if>
+            <if test="userNotice.recipientId != null">
+                and recipient_id = #{userNotice.recipientId}
+            </if>
+            <if test="userNotice.pullTime != null">
+                and pull_time = #{userNotice.pullTime}
+            </if>
+            <if test="userNotice.createTime != null">
+                and create_time = #{userNotice.createTime}
+            </if>
+            <if test="userNotice.updateTime != null">
+                and update_time = #{userNotice.updateTime}
+            </if>
+        </where>
+        <if test="sort != null and sort !=''">
+            order by ${sort} ${order}
+        </if>
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into tbl_user_notice(user_notice_idtitlecontentstatetypesource_idrecipient_idpull_timecreate_timeupdate_time)
+        values (#{userNoticeId}#{title}#{content}#{state}#{type}#{sourceId}#{recipientId}#{pullTime}#{createTime}#{updateTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into tbl_user_notice (title, content, state, type, section_id, source_id, send_id, recipient_id, pull_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+        (#{entity.title}, #{entity.content}, #{entity.state}, #{entity.type}, #{entity.sectionId}, #{entity.sourceId}, #{entity.sendId}, #{entity.recipientId}, #{entity.pullTime})
+        </foreach>
+    </insert>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update tbl_user_notice
+        <set>
+            <if test="userNoticeId != null">
+                user_notice_id = #{userNoticeId},
+            </if>
+            <if test="title != null and title != ''">
+                title = #{title},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="state != null">
+                state = #{state},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="sourceId != null">
+                source_id = #{sourceId},
+            </if>
+            <if test="recipientId != null">
+                recipient_id = #{recipientId},
+            </if>
+            <if test="pullTime != null">
+                pull_time = #{pullTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+</mapper>
+

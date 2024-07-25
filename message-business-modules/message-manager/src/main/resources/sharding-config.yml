@@ -1,0 +1,86 @@
+dataSources:
+  master1:
+    dataSourceClassName: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    # 数据库连接URL，包括数据库地址、端口、数据库名以及连接参数
+    url: jdbc:mysql://127.0.0.1:3306/message_center?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true&autoReconnect=true&serverTimezone=GMT%2B8
+    # 数据库登录用户名
+    username: root
+    # 数据库登录密码
+    password:
+  # 从数据库1配置
+  slave1:
+    # 数据源类名，与主数据库相同
+    dataSourceClassName: com.alibaba.druid.pool.DruidDataSource
+    # JDBC驱动类名，与主数据库相同
+    driverClassName: com.mysql.cj.jdbc.Driver
+    # 数据库连接URL，与主数据库类似，但端口不同
+    url: jdbc:mysql://127.0.0.1:3306/message_center_slave?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true&autoReconnect=true&serverTimezone=GMT%2B8
+    # 数据库登录用户名，与主数据库相同
+    username: root
+    # 数据库登录密码，与主数据库相同
+    password:
+#  slave2:
+#    dataSourceClassName: com.alibaba.druid.pool.DruidDataSource
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://127.0.0.1:3306/huier_store_slave_two?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true&autoReconnect=true&serverTimezone=GMT%2B8
+#    username: root
+#    password: 123456
+
+rules:
+  - !READWRITE_SPLITTING
+    dataSources:
+      # 读写分离逻辑数据源名称
+      readwrite_ds:
+        # 读写分离类型
+        staticStrategy:
+          # 写库数据源名称
+          writeDataSourceName: master1
+          # 读库数据源名称，多个从数据源用逗号分隔，或者使用数组表示
+          # [slave1, slave2]
+          readDataSourceNames:
+            - slave1
+#            - slave2
+        # 负载均衡算法名称
+        loadBalancerName: round_robin
+    # 负载均衡算法配置
+    loadBalancers:
+      # 负载均衡算法名称
+      round_robin:
+        # 负载均衡算法类型
+        type: ROUND_ROBIN
+        # 负载均衡算法属性配置
+        # props:
+        # ...
+  - !SHARDING
+    tables:
+      # 通常为数据库表名
+      tbl_manager_notice:
+        # 定义的实际的数据节点，包括数据库源名称和表名
+        actualDataNodes: master1.tbl_manager_notice
+        keyGenerateStrategy:
+          column: system_notice_id   # 指定要自动生成ID的列名
+          keyGeneratorName: snowflake
+#        # 定义分片策略
+#        tableStrategy:
+#          standard:
+#            # 分片键和分片算法名称
+#            shardingColumn: recipient_id
+#            # ?
+#            shardingAlgorithmName: user_notice_hash_mod
+#    # 分表算法
+#    shardingAlgorithms:
+#      user_notice_hash_mod:
+#        type: HASH_MOD
+#        props:
+#          sharding-count: 2
+    keyGenerators:
+      snowflake:
+        type: SNOWFLAKE
+        props:
+          worker-id: '1'
+
+# 属性配置
+props:
+  # 是否显示执行的SQL语句
+  sql-show: true

@@ -1,0 +1,78 @@
+server:
+  port: 8010
+  servlet:
+    encoding:
+      charset: UTF-8
+
+spring:
+  application:
+    name: message-user-service
+  profiles:
+    active: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+        namespace: bb415748-326d-4474-b330-ec63cf190242
+#        namespace:  bf69dd11-778b-481a-b4be-109ef33a8188
+        username: nacos
+        password: nacos
+        group: DEFAULT_GROUP
+        ephemeral: true
+        weight: 100
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        username: ${spring.cloud.nacos.discovery.username}
+        password: ${spring.cloud.nacos.discovery.password}
+        file-extension: yaml
+#        namespace: bf69dd11-778b-481a-b4be-109ef33a8188
+        namespace: bb415748-326d-4474-b330-ec63cf190242
+        group: DEFAULT_GROUP
+        context-path: /nacos
+        # 共享配置
+        # 这里要注意：
+        # 1.如果spring.profiles.active不指定dev的话，那么会默认加载跟spring.application.name同名的文件，也就是order-service
+        # 2.nacos上除了跟spring.application.name同名的文件外，其它文件一定要带后缀.yaml，比如order-service-dev.yaml
+        # 3.order-service-dev.yaml属性会覆盖shared-configs里面的配置文件同名属性值
+        # 4.如果没有开启本地覆盖远程的属性默认是远程配置大于本地的
+        shared-configs:
+          - data-id: shareConfig.yaml
+            group: DEFAULT_GROUP
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+#        namespace: a4dffc49-899e-4324-ba17-cc56dd21e897
+        namespace:  bb415748-326d-4474-b330-ec63cf190242
+        username: nacos
+        password: nacos
+        group: DEFAULT_GROUP
+        ephemeral: true
+        weight: 100
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        username: ${spring.cloud.nacos.discovery.username}
+        password: ${spring.cloud.nacos.discovery.password}
+        file-extension: yaml
+        namespace: bb415748-326d-4474-b330-ec63cf190242
+#        namespace: a4dffc49-899e-4324-ba17-cc56dd21e897
+        group: DEFAULT_GROUP
+        context-path: /nacos
+        shared-configs:
+          - data-id: shareConfig.yaml
+            group: DEFAULT_GROUP

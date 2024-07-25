@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdu.message.manager.mapper.MessageMapper">
+
+    <resultMap type="com.hdu.message.manager.bean.ManagerNotice" id="TblManagerNoticeMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="systemNoticeId" column="system_notice_id" jdbcType="INTEGER"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="sectionId" column="section_id" jdbcType="INTEGER" />
+        <result property="recipientId" column="recipient_id" jdbcType="INTEGER"/>
+        <result property="managerId" column="manager_id" jdbcType="INTEGER"/>
+        <result property="publishTime" column="publish_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id = "Base_Column_List">
+        id, system_notice_id, title, content, type, state, recipient_id, section_id, manager_id, publish_time, create_time, update_time
+    </sql>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="TblManagerNoticeMap">
+        select
+        <include refid="Base_Column_List" />
+        from tbl_manager_notice
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="TblManagerNoticeMap">
+        select
+        <include refid="Base_Column_List" />
+        from tbl_manager_notice
+        <where>
+            <if test="managerNotice.id != null">
+                and id = #{managerNotice.id}
+            </if>
+            <if test="managerNotice.systemNoticeId != null">
+                and system_notice_id = #{managerNotice.systemNoticeId}
+            </if>
+            <if test="managerNotice.title != null and managerNotice.title != ''">
+                and title like concat('%', #{managerNotice.title}, '%')
+            </if>
+            <if test="managerNotice.content != null and managerNotice.content != ''">
+                and content like concat('%', #{managerNotice.content}, '%')
+            </if>
+            <if test="managerNotice.type != null">
+                and type = #{managerNotice.type}
+            </if>
+            <if test="managerNotice.state != null">
+                and state = #{managerNotice.state}
+            </if>
+            <if test="managerNotice.recipientId != null">
+                and recipient_id = #{managerNotice.recipientId}
+            </if>
+            <if test="managerNotice.managerId != null">
+                and manager_id = #{managerNotice.managerId}
+            </if>
+            <if test="managerNotice.publishTime != null">
+                and publish_time = #{managerNotice.publishTime}
+            </if>
+            <if test="managerNotice.createTime != null">
+                and create_time = #{managerNotice.createTime}
+            </if>
+            <if test="managerNotice.updateTime != null">
+                and update_time = #{managerNotice.updateTime}
+            </if>
+        </where>
+        <if test="sort != null and sort !=''">
+            order by ${sort} ${order}
+        </if>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from tbl_manager_notice
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="systemNoticeId != null">
+                and system_notice_id = #{systemNoticeId}
+            </if>
+            <if test="title != null and title != ''">
+                and title = #{title}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="state != null">
+                and state = #{state}
+            </if>
+            <if test="recipientId != null">
+                and recipient_id = #{recipientId}
+            </if>
+            <if test="managerId != null">
+                and manager_id = #{managerId}
+            </if>
+            <if test="publishTime != null">
+                and publish_time = #{publishTime}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="systemNoticeId" useGeneratedKeys="true">
+        insert into tbl_manager_notice(title, content, type, state, section_id, recipient_id, manager_id, publish_time)
+        values (#{title}, #{content}, #{type}, #{state}, #{sectionId}, #{recipientId}, #{managerId}, #{publishTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into tbl_manager_notice(system_notice_id, title, content, type, state, recipient_id, manager_id, publish_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+        (#{entity.systemNoticeId}, #{entity.title}, #{entity.content}, #{entity.type}, #{entity.state}, #{entity.recipientId}, #{entity.managerId}, #{entity.publishTime})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update tbl_manager_notice
+        <set>
+            <if test="systemNoticeId != null">
+                system_notice_id = #{systemNoticeId},
+            </if>
+            <if test="title != null and title != ''">
+                title = #{title},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="state != null">
+                state = #{state},
+            </if>
+            <if test="recipientId != null">
+                recipient_id = #{recipientId},
+            </if>
+            <if test="managerId != null">
+                manager_id = #{managerId},
+            </if>
+            <if test="publishTime != null">
+                publish_time = #{publishTime},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>
+

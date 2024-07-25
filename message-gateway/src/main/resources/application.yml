@@ -1,0 +1,47 @@
+server:
+  port: 8800
+
+spring:
+  cloud:
+    sentinel:
+      transport:
+        # sentinel客户端
+        dashboard: 127.0.0.1:8080
+      scg:
+        fallback:
+          mode: response
+          response-body: "{\"code\":\"429\",\"msg\":\"当前请求过于频繁，请稍后重试\"}"
+    gateway:
+      # 全局跨域配置
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - DELETE
+              - PUT
+              - OPTION
+      # 路由规则配置
+      routes:
+        - id: message-manager-route # 规则ID
+          uri: lb://message-manager-service # lb表示启用loadbalancer负载均衡器
+          predicates:
+            - Path=/message-manager/** # 页面请求gateway的ip+端口/api-business-store就会进入这个断言规则里面，然后转发到上面的huier-business-store-service服务
+          filters:
+            - StripPrefix=1 # 这里是去掉上面路径中的/api-business-store这一层，完整的转发路径是127.0.0.1:8000/api-business-store/order/add
+        - id: message-user-route
+          uri: lb://message-user-service
+          predicates:
+            - Path=/message-user/**
+          filters:
+            - StripPrefix=1
+
+#白名单
+white:
+  list:
+    urls: #安全路径白名单
+      - /message-manager-route/message/get
+
+
